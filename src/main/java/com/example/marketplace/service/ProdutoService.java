@@ -5,6 +5,7 @@ import com.example.marketplace.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -21,5 +22,13 @@ public class ProdutoService {
 
     public Produto saveProduto(Produto produto) {
         return produtoRepository.save(produto);
+    }
+
+    public void deleteProduto(Long id) {
+        produtoRepository.deleteById(id);
+    }
+
+    public Optional<Produto> getProdutoById(Long id) {
+        return produtoRepository.findById(id);
     }
 }
