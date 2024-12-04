@@ -1,10 +1,24 @@
-# Use a imagem base com Java 21
+# Etapa de construção
+FROM maven:3.8.6-openjdk-17 AS build
+
+# Defina o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Copie os arquivos necessários para o build
+COPY pom.xml .
+COPY src ./src
+
+# Execute o Maven para criar o pacote (JAR)
+RUN mvn clean package -DskipTests
+
+# Etapa de execução
 FROM openjdk:21-jdk-slim
-# Argumento para o arquivo JAR
-ARG JAR_FILE=target/marketplace-0.0.1-SNAPSHOT.jar
-# Copie o JAR do projeto para o contêiner
-COPY ${JAR_FILE} app.jar
+
 # Exponha a porta que o aplicativo irá usar
 EXPOSE 8080
+
+# Copie o JAR do estágio de construção para o estágio de execução
+COPY --from=build /app/target/marketplace-0.0.1-SNAPSHOT.jar app.jar
+
 # Defina o comando para iniciar o aplicativo
 ENTRYPOINT ["java","-jar","/app.jar"]
