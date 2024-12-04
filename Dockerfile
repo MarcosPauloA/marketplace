@@ -1,19 +1,24 @@
-# Use a imagem base com Java 21
-FROM ubuntu:latest AS build
+# Use Maven base image
+FROM maven:3.8.7-openjdk-17-slim AS build
 
-RUN apt-get update
-RUN apt-get install openjdk-17-jdk -y
-COPY . .
-# RUN apt-get install maven -y
-# RUN mvn clean package -DskipTests
+# Set the working directory
+WORKDIR /app
 
+# Copy the pom.xml and source code
+COPY pom.xml .
+COPY src ./src
+
+# Build the project
+RUN mvn clean package -DskipTests
+
+# Use OpenJDK base image for runtime
 FROM openjdk:17-jdk-slim
 
-# Exponha a porta que o aplicativo irá usar
+# Expose the port the application runs on
 EXPOSE 8080
 
-COPY --from=build /target/marketplace-0.0.1-SNAPSHOT.jar app.jar
+# Copy the built JAR file to the container
+COPY --from=build /app/target/*.jar app.jar
 
-
-# Defina o comando para iniciar o aplicativo
-ENTRYPOINT ["java","-jar","/app.jar"]
+# Run the application
+ENTRYPOINT ["java","-jar","app.jar"]
