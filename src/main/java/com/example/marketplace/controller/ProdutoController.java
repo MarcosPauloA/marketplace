@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/produtos")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "https://marketplace-frontend-4cz9mwecr-marcos-projects-7bf269d4.vercel.app")
 public class ProdutoController {
     private final ProdutoService produtoService;
 
