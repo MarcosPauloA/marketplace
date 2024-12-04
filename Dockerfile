@@ -1,24 +1,10 @@
-# Use Maven base image
-FROM maven:3.8.7-openjdk-17-slim AS build
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the pom.xml and source code
-COPY pom.xml .
-COPY src ./src
-
-# Build the project
-RUN mvn clean package -DskipTests
-
-# Use OpenJDK base image for runtime
-FROM openjdk:17-jdk-slim
-
-# Expose the port the application runs on
+# Use a imagem base com Java 21
+FROM openjdk:21-jdk-slim
+# Argumento para o arquivo JAR
+ARG JAR_FILE=target/*.jar
+# Copie o JAR do projeto para o contêiner
+COPY ${JAR_FILE} app.jar
+# Exponha a porta que o aplicativo irá usar
 EXPOSE 8080
-
-# Copy the built JAR file to the container
-COPY --from=build /app/target/*.jar app.jar
-
-# Run the application
-ENTRYPOINT ["java","-jar","app.jar"]
+# Defina o comando para iniciar o aplicativo
+ENTRYPOINT ["java","-jar","/app.jar"]
