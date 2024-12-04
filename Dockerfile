@@ -1,24 +1,19 @@
-# Etapa de construção
-FROM maven:3.8.6-openjdk-17 AS build
+# Use a imagem base com Java 21
+FROM ubuntu:latest AS build
 
-# Defina o diretório de trabalho dentro do contêiner
-WORKDIR /app
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
+COPY . .
+RUN apt-get install maven -y
+RUN mvn clean install
 
-# Copie os arquivos necessários para o build
-COPY pom.xml .
-COPY src ./src
-
-# Execute o Maven para criar o pacote (JAR)
-RUN mvn clean package -DskipTests
-
-# Etapa de execução
-FROM openjdk:21-jdk-slim
+FROM openjdk:17-jdk-slim
 
 # Exponha a porta que o aplicativo irá usar
 EXPOSE 8080
 
-# Copie o JAR do estágio de construção para o estágio de execução
-COPY --from=build /app/target/marketplace-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /target/marketplace-0.0.1-SNAPSHOT.jar app.jar
+
 
 # Defina o comando para iniciar o aplicativo
 ENTRYPOINT ["java","-jar","/app.jar"]
