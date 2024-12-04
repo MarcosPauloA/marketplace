@@ -1,14 +1,16 @@
-# Use a imagem base com Java 21
+FROM ubuntu:latest AS build
+
+RUN apt-get update
+RUN apt-get install openjdk-17-sdk -y
+COPY . .
+
+RUN apt-get install maven -y
+RUN mvn clean install
+
 FROM openjdk:21-jdk-slim
 
-# Argumento para o arquivo JAR
-ARG JAR_FILE=target/*.jar
-
-# Copie o JAR do projeto para o contêiner
-COPY ${JAR_FILE} app.jar
-
-# Exponha a porta que o aplicativo irá usar
 EXPOSE 8080
 
-# Defina o comando para iniciar o aplicativo
+COPY --from=build /target/marketplace-0.0.1-SNAPSHOT.jar app.jar
+
 ENTRYPOINT ["java","-jar","/app.jar"]
